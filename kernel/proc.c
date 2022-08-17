@@ -303,6 +303,9 @@ fork(void)
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
+  // copy trace mask from the parent to the child process
+  np->mask = p->mask;
+
   pid = np->pid;
 
   release(&np->lock);
@@ -653,4 +656,20 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+// Look in the process table to count the number of processes 
+// whose state is not UNUSED.
+int
+countproc(void)
+{
+  struct proc *p;
+  int count = 0;
+
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if(p->state != UNUSED) {
+      ++count;
+    }
+  }
+  return count;
 }
